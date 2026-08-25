@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trilha de Mensagens — Ignus Dance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#E6007A;
+    --pink-deep:#AD0060;
+    --pink-soft:#FFE3F1;
+    --ink:#1B1420;
+    --paper:#FFF9FC;
+    --card:#FFFFFF;
+    --purple:#8B5FBF;
+    --purple-soft:#F1E9FB;
+    --muted:#7A7280;
+    --line:#F0DCE9;
+    --green-ok:#1FAE6E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{ font-family:'Space Grotesk',sans-serif; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background:var(--ink);
+    color:#fff;
+    padding:14px 18px 12px;
+  }
+  .topbar-row{
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:920px; margin:0 auto;
+    gap:12px;
+  }
+  .brand{ display:flex; flex-direction:column; line-height:1.1; }
+  .brand .eyebrow{
+    font-size:10px; letter-spacing:.14em; color:var(--pink);
+    font-weight:700; text-transform:uppercase;
+  }
+  .brand h1{ font-size:19px; margin:2px 0 0; font-weight:700; }
+
+  .study-toggle{
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:#D8CFE0; white-space:nowrap;
+  }
+  .switch{
+    width:38px; height:22px; border-radius:20px; background:#3A2E42;
+    position:relative; cursor:pointer; flex-shrink:0;
+    border:1px solid #55455F;
+  }
+  .switch .knob{
+    position:absolute; top:2px; left:2px; width:16px; height:16px;
+    border-radius:50%; background:#D8CFE0; transition:transform .18s ease;
+  }
+  .switch.on{ background:var(--pink); border-color:var(--pink);}
+  .switch.on .knob{ transform:translateX(16px); background:#fff; }
+
+  .search-wrap{ max-width:920px; margin:12px auto 0; position:relative; }
+  .search-wrap input{
+    width:100%; padding:11px 14px 11px 38px;
+    border-radius:12px; border:none; outline:none;
+    background:#2A222F; color:#fff; font-size:14px; font-family:'Inter',sans-serif;
+  }
+  .search-wrap input::placeholder{ color:#9C90A6; }
+  .search-wrap svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); }
+
+  .chips{
+    max-width:920px; margin:12px auto 0; display:flex; gap:8px;
+    overflow-x:auto; padding-bottom:2px; scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex-shrink:0; padding:7px 14px; border-radius:999px;
+    background:#2A222F; color:#D8CFE0; font-size:13px; font-weight:600;
+    cursor:pointer; border:1px solid transparent; transition:.15s;
+    white-space:nowrap;
+  }
+  .chip.active{ background:var(--pink); color:#fff; }
+
+  /* ---------- Body ---------- */
+  .wrap{ max-width:920px; margin:0 auto; padding:20px 16px 80px; }
+
+  .counter{
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--muted); margin:0 0 18px;
+  }
+  .counter b{ color:var(--pink-deep); font-family:'Space Grotesk',sans-serif; font-size:14px;}
+
+  .section{ margin-bottom:34px; }
+  .section-head{
+    display:flex; align-items:center; gap:10px; margin-bottom:14px;
+  }
+  .section-head .icon{
+    width:34px; height:34px; border-radius:10px;
+    background:var(--pink-soft); display:flex; align-items:center; justify-content:center;
+    font-size:17px; flex-shrink:0;
+  }
+  .section-head h2{ font-size:16px; margin:0; letter-spacing:.01em; }
+  .section-head .count{ font-size:12px; color:var(--muted); }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:14px 14px 12px; margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(27,20,32,.03);
+  }
+  .card-title{
+    font-size:13px; font-weight:700; color:var(--pink-deep);
+    margin:0 0 10px; text-transform:uppercase; letter-spacing:.03em;
+  }
+  .note{
+    font-size:12.5px; color:var(--muted); font-style:italic;
+    margin:-4px 0 12px; padding-bottom:10px; border-bottom:1px dashed var(--line);
+  }
+
+  .bubble-row{ display:flex; justify-content:flex-end; margin-bottom:8px; }
+  .bubble-row:last-child{ margin-bottom:0; }
+  .bubble{
+    position:relative;
+    max-width:88%;
+    background:linear-gradient(135deg,var(--pink) 0%,var(--pink-deep) 100%);
+    color:#fff; padding:10px 22px 10px 14px; border-radius:14px 14px 3px 14px;
+    font-size:14px; line-height:1.5; white-space:pre-wrap;
+    cursor:pointer;
+    transition:transform .12s ease;
+    margin-top:6px;
+  }
+  .bubble:active{ transform:scale(.985); }
+  .placeholder{
+    background:rgba(255,255,255,.28);
+    padding:1px 6px; border-radius:6px; font-weight:700;
+    font-family:'Space Grotesk',sans-serif; font-size:12.5px;
+  }
+  .copy-fab{
+    position:absolute; top:-9px; right:-9px;
+    width:26px; height:26px; border-radius:50%;
+    background:#fff; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 5px rgba(27,20,32,.15);
+    cursor:pointer;
+  }
+  .copy-fab svg{ width:13px; height:13px; }
+  .copy-fab.done{ background:var(--green-ok); border-color:var(--green-ok); }
+
+  /* study mode */
+  .study .bubble:not(.revealed){
+    color:transparent; text-shadow:0 0 9px rgba(255,255,255,.9);
+    background:repeating-linear-gradient(135deg,var(--purple),var(--purple) 8px,#9E72CE 8px,#9E72CE 16px);
+  }
+  .study .bubble:not(.revealed)::after{
+    content:'Toque para revelar'; position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:12px; font-weight:700; text-shadow:none;
+    background:rgba(0,0,0,.18); border-radius:inherit;
+  }
+  .study .copy-fab{ display:none; }
+  .study .bubble.revealed .copy-fab{ display:flex; }
+  .study .bubble.revealed::after{ content:none; }
+
+  .toast{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:999px;
+    font-size:13px; font-weight:600; opacity:0; pointer-events:none;
+    transition:all .22s ease; display:flex; align-items:center; gap:8px; z-index:60;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .empty{ text-align:center; padding:50px 20px; color:var(--muted); }
+  .empty .big{ font-size:34px; margin-bottom:8px; }
+
+  @media (max-width:480px){
+    .brand h1{ font-size:16px; }
+    .study-toggle{ font-size:11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <div class="brand">
+      <span class="eyebrow">Ignus Dance</span>
+      <h1>Trilha de Mensagens</h1>
+    </div>
+    <div class="study-toggle">
+      <span id="studyLabel">Modo Estudo</span>
+      <div class="switch" id="studySwitch" onclick="toggleStudy()"><div class="knob"></div></div>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9C90A6" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="search" type="text" placeholder="Buscar palavra-chave, ex: preço, endereço, atrasou..." oninput="renderAll()">
+  </div>
+  <div class="chips" id="chips"></div>
+</div>
+
+<div class="wrap">
+  <div class="counter">📋 Mensagens copiadas nesta sessão: <b id="copyCount">0</b></div>
+  <div id="content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = [
+  {
+    id: "marcacao", icon: "💃", title: "Marcação de Aulas Experimentais",
+    items: [
+      { title: "Hip-Hop", bubbles: [
+        "A melhor forma de sentir como é uma aula é vindo para uma aula experimental! Esses são os horários das turmas que temos no momento👇:\n\nHip Hop Juvenil\nTerças e Quintas – Das 18 às 19h (Prof: Jay 🔥)",
+        "Qual desses horários encaixa melhor pra você? ✨"
+      ]},
+      { title: "K-Pop", bubbles: [
+        "Claroo! Temos duas turmas de K-POP acontecendo no momento que acredito que ela pode gostar bastante 👇:\n\nQuintas Feiras – K-Pop Juvenil (19h - 20h)\nSábados – K-Pop Juvenil (17h - 18h) | Prof: Kauê 👑"
+      ]},
+      { title: "Kids", bubbles: [
+        "Para as crianças também temos algumas aulas acontecendo no momento 👇:\n\nSeg/Quarta (18h - 19h) – Hip hop Kids (5 anos)\nTerça e quinta (18h - 19h) – Hip Hop Juvenil (9 anos)",
+        "Qual seria o melhor horário para ela? ✨"
+      ]},
+      { title: "Adultos", bubbles: [
+        "A melhor forma de sentir como é uma aula é vindo para uma aula experimental! Essas são todas as aulas que temos no momento👇:\n\nSeg/Qua (20h - 21h) – Jazz Funk\nTerça e quinta – Hip Hop Adults (14h - 15h/ 19h - 20h)\nSábados – Femme Class (14h - 15h); Jazz Funk (15h - 16h)",
+        "Qual desses horários encaixa melhor pra você? ✨"
+      ]},
+      { title: "Depois que ela escolher a modalidade", note: "Use assim que o aluno já respondeu qual modalidade tem interesse.", bubbles: [
+        "Aaa legall! A gente ainda tem duas vagas disponíveis para aula experimental de hoje as [horário], podemos reservar uma delas para você? 💜"
+      ]}
+    ]
+  },
+  {
+    id: "lembrete", icon: "⏰", title: "Lembrete de Aula Experimental",
+    items: [
+      { title: "Um dia antes", note: "Enviar no dia anterior à aula experimental do aluno.", bubbles: [
+        "Bom dia [nome], tudo bem? Aqui quem fala é o Clarivenilson ✨",
+        "Passando por aqui para lembrar da sua aula experimental de [modalidade] com a gente hoje as [horário], podemos confirmar? 🔥"
+      ]},
+      { title: "No dia da aula", bubbles: [
+        "Bom dia, tudo bem? 💜",
+        "Chegou o dia da sua aula experimental! Lembre-se de levar roupas confortáveis, tênis e água! 🫧"
+      ]}
+    ]
+  },
+  {
+    id: "preco", icon: "💰", title: "Quanto Custa?",
+    items: [
+      { title: "Primeira resposta sobre preço", note: "Não deixamos sem informação, mas convidamos pra conhecer o valor da aula antes de fechar nos números.", bubbles: [
+        "A gente trabalha com alguns formatos de pacote mensal, mas antes de te passar valores, a gente costuma convidar pra uma aula experimental, pra você sentir se a vibe da turma e do estilo fazem sentido pra você.",
+        "Pra te dar uma referência, nossos planos mensais começam a partir de R$260,00, e depois da aula eu te explico as opções certinho 😊"
+      ]},
+      { title: "Apresentação dos valores — Opção A", bubbles: [
+        "Claro! Vou te enviar por aqui os nossos planos Trimestral e Semestral, pensados para quem quer manter a constância nas aulas e aproveitar um valor mais vantajoso.\n\n🕊️ Plano Fênix (Semestral)\n• 1x semana: 6x de R$198,00\n• 2x semana: 6x de R$265,33\n\n🔥 Plano Fogo (Trimestral)\n• 1x semana: 3x de R$215,00\n• 2x semana: 3x de R$285,00\n\nTambém existe a opção Mensal, caso prefira, mas os planos acabam ficando bem mais vantajosos ao longo do tempo 💜",
+        "Nesse momento qual faz mais sentido para você?"
+      ]},
+      { title: "Apresentação dos valores — Opção B", bubbles: [
+        "Hoje a gente trabalha com planos por modalidade que se adaptam à sua rotina:\n\n🕊️ Plano Fênix (Semestral)\n• 1x semana: 6x de R$198,00\n• 2x semana: 6x de R$265,33\n\n🔥 Plano Fogo (Trimestral)\n• 1x semana: 3x de R$215,00\n• 2x semana: 3x de R$285,00\n\nTambém existe a opção Mensal, caso prefira, mas os planos acabam ficando bem mais vantajosos ao longo do tempo 💜",
+        "Nesse momento qual faz mais sentido para você?"
+      ]},
+      { title: "Plano Mensal", bubbles: [
+        "Plano Mensal ✨\n\n• 1x na semana: R$260,00\n• 2x na semana: R$330,00"
+      ]}
+    ]
+  },
+  {
+    id: "vacuo", icon: "👋", title: "Vácuo Inesperado (Lead Sumiu)",
+    items: [
+      { title: "Variante 1", note: "A pessoa some, mas geralmente é rotina, não desinteresse. Vale um resgate leve.", bubbles: [
+        "Bom dia [nome]! Passando aqui rapidinho porque sei que às vezes a correria do dia engole a gente 😅",
+        "Se quiser ver direitinho os horários ou tirar qualquer dúvida, é só me chamar aqui 💜"
+      ]},
+      { title: "Variante 2", bubbles: [
+        "Bom dia [nome]! Passando aqui rapidinho porque sei que às vezes a correria do dia engole a gente 😅",
+        "Se tiver qualquer dúvida sobre a modalidade ou sobre os planos é só me chamar aqui 💜"
+      ]}
+    ]
+  },
+  {
+    id: "local", icon: "📍", title: "Onde Fica a Escola?",
+    items: [
+      { title: "Localização", bubbles: [
+        "Localização da nossa 🏡:\n\nNossa escola fica aqui no Campeche em uma transversal na Rua da Capela (mesmo local em que fica Estúdio Movimento)\n\nhttps://maps.app.goo.gl/9ts4aqyW9ZT8Ttqg9?g_st=aw",
+        "É bem tranquilo de chegar! Inclusive, muita gente que vem pela primeira vez acha que é mais longe do que realmente é 😊",
+        "Aproveitando, essa semana ainda tenho algumas vagas pra aula experimental, e é bem de boa, você vem, experimenta e sente se é pra você, sem compromisso ✨",
+        "Posso encaminhar os horários das modalidades pra você por aqui mesmo? 💜"
+      ]},
+      { title: "Objeção: \"é muito longe\"", bubbles: [
+        "Super entendo a questão da distância 😅 Mas muita gente da nossa turma vem de longe também, tipo Trindade e até depois da ponte. O pessoal fala que o trajeto vira parte do ritual, tipo, é o momento de descontrair antes da aula 🚌🔥",
+        "A gente iniciou com turmas nova aos sábados também, é um momento bem legal pra experimentar! 💜",
+        "Posso mandar para você as modalidades que acontecem no sábado por aqui mesmo?"
+      ]}
+    ]
+  }
+];
+
+let activeChip = "todas";
+let studyMode = false;
+let copyCount = 0;
+
+function escapeHtml(s){
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function formatBubble(text){
+  return escapeHtml(text).replace(/\[([^\]]+)\]/g, '<span class="placeholder">[$1]</span>');
+}
+
+function buildChips(){
+  const chipsEl = document.getElementById('chips');
+  const all = [{id:"todas", icon:"✨", title:"Todas"}].concat(DATA.map(s=>({id:s.id, icon:s.icon, title:s.title.split(' ')[0]})));
+  chipsEl.innerHTML = all.map(c => `<div class="chip ${activeChip===c.id?'active':''}" onclick="setChip('${c.id}')">${c.icon} ${c.title}</div>`).join('');
+}
+function setChip(id){ activeChip = id; buildChips(); renderAll(); }
+
+function toggleStudy(){
+  studyMode = !studyMode;
+  document.getElementById('studySwitch').classList.toggle('on', studyMode);
+  renderAll();
+}
+
+function matches(text, q){ return text.toLowerCase().includes(q); }
+
+function renderAll(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const content = document.getElementById('content');
+  let html = '';
+  let totalShown = 0;
+
+  DATA.forEach(section => {
+    if(activeChip!=='todas' && activeChip!==section.id) return;
+
+    const items = section.items.filter(item => {
+      if(!q) return true;
+      if(matches(item.title.toLowerCase(), q)) return true;
+      return item.bubbles.some(b => matches(b.toLowerCase(), q));
+    });
+    if(items.length===0) return;
+
+    totalShown += items.length;
+    html += `<div class="section">
+      <div class="section-head">
+        <div class="icon">${section.icon}</div>
+        <h2>${section.title}</h2>
+        <span class="count">· ${items.length}</span>
+      </div>`;
+
+    items.forEach((item, idx) => {
+      html += `<div class="card ${studyMode?'study':''}">
+        <p class="card-title">${item.title}</p>
+        ${item.note ? `<p class="note">${item.note}</p>` : ''}`;
+      item.bubbles.forEach((b, bi) => {
+        const bubbleId = `${section.id}-${idx}-${bi}`;
+        html += `<div class="bubble-row">
+          <div class="bubble" id="bub-${bubbleId}" onclick="revealBubble('${bubbleId}')">
+            ${formatBubble(b)}
+            <div class="copy-fab" onclick="event.stopPropagation(); copyBubble('${bubbleId}', this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="${'#E6007A'}" stroke-width="2.4"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+            </div>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+
+  if(totalShown===0){
+    html = `<div class="empty"><div class="big">🔎</div>Nenhuma mensagem encontrada.<br>Tenta buscar por outra palavra.</div>`;
+  }
+
+  content.innerHTML = html;
+  // store raw text for copy
+  DATA.forEach((section, si) => {
+    section.items.forEach((item, idx) => {
+      item.bubbles.forEach((b, bi) => {
+        const id = `${section.id}-${idx}-${bi}`;
+        const el = document.getElementById(`bub-${id}`);
+        if(el) el.dataset.raw = b;
+      });
+    });
+  });
+}
+
+function revealBubble(id){
+  if(!studyMode) return;
+  const el = document.getElementById(`bub-${id}`);
+  el.classList.add('revealed');
+}
+
+function copyBubble(id, fabEl){
+  const el = document.getElementById(`bub-${id}`);
+  const text = el.dataset.raw;
+  const doCopy = () => {
+    copyCount++;
+    document.getElementById('copyCount').textContent = copyCount;
+    fabEl.classList.add('done');
+    fabEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+    showToast('Copiado! Cole no WhatsApp ✅');
+    setTimeout(()=>{
+      fabEl.classList.remove('done');
+      fabEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#E6007A" stroke-width="2.4"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>';
+    }, 1400);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(doCopy).catch(()=>fallbackCopy(text, doCopy));
+  } else {
+    fallbackCopy(text, doCopy);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); cb(); }catch(e){ showToast('Não consegui copiar automaticamente.'); }
+  document.body.removeChild(ta);
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+buildChips();
+renderAll();
+</script>
+</body>
+</html>
